@@ -2,6 +2,10 @@ name: Base OS Docker image
 
 on:
   push:
+    paths:
+      - '.github/workflows/docker-image.yml'
+      - 'docker/Dockerfile'
+      - 'docker/*.sh'
     tags:
       - v*
   repository_dispatch:
