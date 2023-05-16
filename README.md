@@ -33,7 +33,7 @@ Some remarks to avoid confusion:
   I used a 5.10.178 kernel from Debian 11.
   You can install an updated *amdgpu* driver, I tried with 5.18.2.22.40-1504718.20.04, but couldn't find
   any difference.
-  To check if the driver is working run *ls -la /dev/kfd* you should see device owned by *root* for the
+  To check if the driver is working run *ls -la /dev/kfd* you should see a device owned by *root* for the
   *render* group
 - Docker engine, otherwise [install](https://docs.docker.com/engine/install/) it.
 - Your Linux user must be in the *video* and *render* groups. Run the *groups* command to verify it.
@@ -43,7 +43,7 @@ Some remarks to avoid confusion:
 1. Clone this repo, or just download the
    [start_webui.sh](https://github.com/set-soft/sd_webui_rx5500/blob/main/docker/start_webui.sh)
    script.
-2. Pull the docker images (here is how to [install](https://docs.docker.com/engine/install/))
+2. Pull the docker image:
 ```
 $ docker pull setsoft/sd_webui:latest
 ```
@@ -64,3 +64,8 @@ $ docker pull setsoft/sd_webui:latest
    Also note that the first generation will need more memory, so don't start changing the image size, keep
    it low for the first generated image.
 9. Have fun!
+
+All the data will be stored in the *~/dockerx/* folder. Take a look at *~/dockerx/webui_data/* for the
+web interface data. The *~/dockerx/webui_data/* is the cache for the system running inside the container.
+Generated stuff will be stored in *~/dockerx/webui_data/outputs*. The downloaded AI data can be found in
+*~/dockerx/webui_data/models*.
