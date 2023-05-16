@@ -11,6 +11,7 @@ The main features of these docker images are:
 - Ready to be used with RX5500XT (all needed options and compatible tools)
 - Small size, when compared to other options (2.5 GB compressed image, 10.5 GB uncompressed, for the soft)
 - No need to mess your base OS (no need to install stuff on your base system)
+- Already created, one download and all the software is installed
 
 Some remarks to avoid confusion:
 - For Linux systems, not for Windows
