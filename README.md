@@ -8,35 +8,35 @@ web interface on Linux systems equiped with AMD Radeon
 and similar boards (i.e. RX5600XT, RX5700XT).
 
 The main features of these docker images are:
-- Ready to be used with RX5500XT (all needed options and compatible tools)
-- Small size, when compared to other options (2.5 GB compressed image, 10.5 GB uncompressed, for the soft)
-- No need to mess your base OS (no need to install stuff on your base system)
-- Already created, one download and all the software is installed
+- Ready to be used with RX5500XT (all needed options and compatible tools).
+- Small size, when compared to other options (2.5 GB compressed image, 10.5 GB uncompressed, for the soft).
+- No need to mess your base OS (no need to install stuff on your base system).
+- Already created, one download and all the software is installed.
 
 Some remarks to avoid confusion:
 - For Linux systems, not for Windows
-- For AMD GPUs, not for NVidia
-- All software included, not the data files, they will be downloaded by the software
+- For AMD GPUs, not for NVidia.
+- All software included, not the data files, they will be downloaded by the software.
   You'll need not less than 5 GiB of extra disk space.
-- Default config is for boards eith 8 GB of memory. Can run on 4 GB
-- This is an image generator using AI networks, not a text generator
+- Default config is for boards with 8 GB of memory. Can run on 4 GB.
+- This is an image generator using AI networks, not a text generator.
 - Check how old is this README.md file, things change very fast in this field, if the file is old be
-  careful, may contain inaccurate content
+  careful, may contain inaccurate content.
 
 ## Pre requisites
 
 - A machine with an AMD Radeon GPU board, ideally RX5500XT.
   This board was released in 2019, forget about using anything older than RX470 (2016).
 - At least 4 GB of VRAM (Video RAM)
-- I'm not sure about how much system memory, I used 16 GB RAM and you'll need some swap
+- I'm not sure about how much system memory, I used 16 GB RAM and you'll need some swap.
 - A modern Linux kernel with the *amdgpu* driver.
   I used a 5.10.178 kernel from Debian 11.
   You can install an updated *amdgpu* driver, I tried with 5.18.2.22.40-1504718.20.04, but couldn't find
   any difference.
   To check if the driver is working run *ls -la /dev/kfd* you should see device owned by *root* for the
   *render* group
-- Docker engine, otherwise [install](https://docs.docker.com/engine/install/) it
-- Your Linux user must be in the *video* and *render* groups. Run the *groups* command to verify it
+- Docker engine, otherwise [install](https://docs.docker.com/engine/install/) it.
+- Your Linux user must be in the *video* and *render* groups. Run the *groups* command to verify it.
 
 ## Quick instructions
 
@@ -48,7 +48,7 @@ Some remarks to avoid confusion:
 $ docker pull setsoft/sd_webui:latest
 ```
 3. Create a directory called *dockerx* in your user home dir, i.e. *mkdir -p $HOME/dockerx*.
-   You can change the name editing the start script, not recommended
+   You can change the name editing the start script, not recommended.
 4. If you have 4 GB of GPU memory you must edit *start_webui.sh* and change **--medvram** by **--lowvram**.
    If you have more than 8 GB you may want to remove **--medvram** option, but I recommend to first
    try keeping it.
@@ -62,5 +62,5 @@ $ docker pull setsoft/sd_webui:latest
    The first run after starting the server will take longer, around 3 or 4 minutes in my system.
    Then the time will go down, 14 s aprox. for my system.
    Also note that the first generation will need more memory, so don't start changing the image size, keep
-   it low for the first generated image
+   it low for the first generated image.
 9. Have fun!
