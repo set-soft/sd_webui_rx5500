@@ -245,7 +245,100 @@ then removes both to install the one we need (*opencv-contrib-python-headless*).
 
 This part of the stack can be farther optimized.
 
-#### Stable Diffusion WebUI
+#### Stable Diffusion WebUI by AUTOMATIC1111
 
-This is the application we want to run.
+This is the application we want to run. Is implemented as a web server using the
+[gradio](https://gradio.app/) module, specifically designed to create ML applications.
 
+The application implements a lot of interesting tools, mostly using existing projects, and is extensible.
+Among the built-in features are:
+
+- Text to image, used to generate images from a description. Supports negative prompts, various sampling
+  methodes, batch generation, etc. This is implemented using Stable Diffusion.
+- Image to image, used to create an image from another image. Some features:
+  - Interrogate using CLIP and DeepDanbooru: generates a prompt from an image
+  - Inpaint: allows to generate a portion of the image to solve issues or just change some detail
+- Face restoration
+- Upscalers, using mathematic algorithms and also AI
+- Training models and merging models
+
+You'll find a more complete list in its [site](https://github.com/AUTOMATIC1111/stable-diffusion-webui).
+
+The server will run in the docker container and you just need to connect to the server using a browser.
+The default is to export the interface to the local machine: http://127.0.0.1:7860 accepting connections
+only from the local host, but can be exported to other machines.
+
+#### Conclusion
+
+This is an state of the art AI powered image generator. The webui is like an AI laboratory because it's
+extensible and gradio was designed for this. The AUTOMATIC1111 implementation is very complete and easy
+to use. Neural networks are automatically downloaded, you must pay attention to the console where the
+server was started to see the progress.
+
+The installation is simple, but can be tricky for AMD boards. Using a docker image allows to solve various
+common problems.
+
+The amount of misleading instructions and bloated installs is notable. AMD seems to be focused in the
+servers applications of ROCm, so they don't spend eough resources to help regular users.
+
+### Optimizations and options
+
+If you take a look at the original [Stable Diffusion v1](https://github.com/CompVis/stable-diffusion)
+you'll see it says: *runs on a GPU with at least 10GB VRAM*
+And in fast this code doesn't even work on an RX5500XT with 8 GB.
+So memory requirements are very important. You can currently run it on 4 GB, and even some report success
+with 2 GB (not for RX5500XT). A number of options has important impact on the memory usage and performance.
+Here are some thing you may need to know.
+
+The optimizations are documented [here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Optimizations).
+I focuse on what is good for RX5500XT, and maybe other similar boards.
+
+#### Floating point format
+
+The traditional *float* data type in C is a 32 bits floating point number (F32). For ML you can do
+computations with much less resolution. So you'll find a lot of libraries using *half precision* numbers,
+this is a 16 bits floating point (F16).
+
+The RX5500XT board, and other AMD GPUs, can't do F16 computations. So you must force the use of F32.
+This has an important impact in the memory usage.
+
+The options: *--precision full* and *--no-half* are used to force F32 data computations.
+
+#### Saving VRAM swapping data to the RAM
+
+Using full precision means you'll need a lot of VRAM, even to generate one 512x512 image. So one of the
+important strategies is to keep in VRAM only the needed stuff. You can parition the problem in stages
+and upload one at a time.
+
+The *--medvram* and *--lowvram* options are the most important here. The first is what I recommend for
+an 8 GB board using full precision. This has a small impact on the computation time and big impact in
+the memory usage. The second option is a very aggressive strategy with very big impact on the computation
+time, only recommendable for 4 GB boards.
+
+Another option is in the settings of the webui, you can ask to avoid keeping the face restoration net
+in RAM when the process is done. Face restoration is very important, you don't need to enable it all the
+time, you can generate the images and then go to the *extras* and apply it to the images you selected.
+But having it enabled is nice and it usually takes just a little bit more time, the results are
+remarkable.
+
+#### Sub-quadratic attention
+
+This methode notably reduces the use of VRAM without slowing the computations.
+Use *--opt-sub-quad-attention*
+
+#### Host system RAM
+
+The tools has some serious memory issues. If you run it for some hours you'll see how free memory slowly
+falls until you have nothing available and the server is killed by the kernel. To avoid this problem you
+must use an improved memory allocation library. The *libtcmalloc* library implements such an allocator.
+Using it the memory leaks are kept low.
+
+This library is installed in the docker image (libtcmalloc-minimal4) and is forced using the *LD_PRELOAD*
+environment variable (`LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4`)
+
+#### Unofficial ROCm support
+
+The RX5500XT (aka Navi14) boards aren't officially supported by AMD. They are codenamed *gfx1012*, but if
+you tell ROCm the board is a *gfx1030* things work anyways. The 1030, 1012, etc. is the version, so you
+need to define the `HSA_OVERRIDE_GFX_VERSION=10.3.0` environment variable, which basically pretends your
+board is version 10.3.0 and not 10.1.2.
