@@ -368,3 +368,18 @@ I tried the above mentioned variables and didn't notice any change, which is und
 Other people suggests using *--disable-nan-check*. I couldn't see any measurable difference using it for
 RX5500XT, and it sounds like a bad idea, a [NaN](https://en.wikipedia.org/wiki/NaN) is indication of
 error, can be related to memory corruption.
+
+#### Overclocking
+
+The RX5500XT doesn't seem to be a board to overclock.
+
+By default it runs at 1890 MHz, the PLL can do 2200 MHz. In my board 2050 MHz is usable, but
+2100 MHz generates a memory access fault. Even at the highest Vdd.
+
+The VRAM clock is 875 MHz and can be boosted to 930 MHz. I was able to set it to 930 MHz, but you
+see an annoying video flicker, specially when moving the mouse.
+
+With all of this I got a computation boost in SD of about 5 %. So I don't recommend to do it, the
+flicker is annoying, and the advantage marginal. If you are really interested consult the
+[kernel docs](https://docs.kernel.org/6.1/gpu/amdgpu/thermal.html) and articles like
+[this](https://www.reddit.com/r/Amd/comments/agwroj/how_to_overclock_your_amd_gpu_on_linux/).
