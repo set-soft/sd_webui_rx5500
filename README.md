@@ -321,6 +321,14 @@ time, you can generate the images and then go to the *extras* and apply it to th
 But having it enabled is nice and it usually takes just a little bit more time, the results are
 remarkable.
 
+When using *--medvram* or *--lowvram* one of the implicit optimizations is to put in VRAM only the
+positive or the negative prompt, one at a time, never both together. This saves VRAM, but also means
+moving a lot of data to and from VRAM. If you want to recover some performance, at the cost of VRAM, you
+can try using *--always-batch-cond-uncond*. Using this both prompts are stored in VRAM during the whole
+process. So this option makes *--medvram* and *--lowvram* less effective in terms of VRAM, but also
+reduces the impact in performance. Note that this option is useless when you don't use *--medvram* or
+*--lowvram*.
+
 #### Sub-quadratic attention
 
 This methode notably reduces the use of VRAM without slowing the computations.
@@ -342,3 +350,21 @@ The RX5500XT (aka Navi14) boards aren't officially supported by AMD. They are co
 you tell ROCm the board is a *gfx1030* things work anyways. The 1030, 1012, etc. is the version, so you
 need to define the `HSA_OVERRIDE_GFX_VERSION=10.3.0` environment variable, which basically pretends your
 board is version 10.3.0 and not 10.1.2.
+
+#### Options that doesn't seem to help
+
+I see many people suggesting *SAFETENSORS_FAST_GPU=1*, but this is a CUDA (NVidia) option to copy data
+directly to VRAM, skipping a RAM stage. Not part of ROCm.
+
+People also encourage using *PYTORCH_CUDA_ALLOC_CONF*, but again this is CUDA specific. Is well documented
+in [PyTorch](https://pytorch.org/docs/stable/notes/cuda.html) as a mechanism to fine-tune the CUDA
+allocation strategy. But isn't mentioned in the
+[HIP (ROCm) semantics](https://pytorch.org/docs/stable/notes/hip.html). I think the confusion comes from
+the error printed by PyTorch when you run out of VRAM, it mentions *PYTORCH_HIP_ALLOC_CONF*. Note the
+difference, HIP, not CUDA. By I suspect this is some misleading print.
+
+I tried the above mentioned variables and didn't notice any change, which is understandable.
+
+Other people suggests using *--disable-nan-check*. I couldn't see any measurable difference using it for
+RX5500XT, and it sounds like a bad idea, a [NaN](https://en.wikipedia.org/wiki/NaN) is indication of
+error, can be related to memory corruption.
