@@ -17,7 +17,7 @@ mv /opt/stable-diffusion-webui/repositories/CodeFormer/weights/ /opt/stable-diff
 ln -s $DATA/models/Codeformer/weights /opt/stable-diffusion-webui/repositories/CodeFormer/weights
 mkdir -p $DATA/outputs
 ln -s $DATA/outputs /opt/stable-diffusion-webui/outputs
-chown -R $USERNAME:$USERNAME $DATA
+sudo chown -R $USERNAME:$USERNAME $DATA
 # The working directory is SD-webui repo
 cd /opt/stable-diffusion-webui/
 
