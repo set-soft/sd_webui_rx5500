@@ -41,9 +41,18 @@ RUN --mount=type=cache,target=/root/.cache/pip,id=pip \
     --mount=type=cache,target=/root/.cache/huggingface,id=huggingface \
     pip cache info &&\
     cd /opt &&\
-    git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git &&\
+    git clone --depth 1 https://github.com/AUTOMATIC1111/stable-diffusion-webui.git &&\
     cd stable-diffusion-webui/ &&\
+    echo "Install all WebUI deps" &&\
     python launch.py --exit --skip-torch-cuda-test &&\
+    echo "Install Control Net deps" &&\
+    pip install mediapipe fvcore &&\
+    echo "Install Control Net repo" &&\
+    cd /opt/stable-diffusion-webui/extensions/ &&\
+    git clone --depth 1 https://github.com/Mikubill/sd-webui-controlnet.git &&\
+    echo "Clean-up the repos" &&\
+    chmod -R +w /opt/stable-diffusion-webui/repositories/*/.git &&\
+    rm -r /opt/stable-diffusion-webui/repositories/*/.git &&\
     echo "Keep only one OpenCV, and without X11 support" &&\
     pip uninstall -y opencv-contrib-python opencv-python &&\
     pip install opencv-contrib-python-headless &&\
