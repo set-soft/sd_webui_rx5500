@@ -21,7 +21,7 @@ docker run -it --rm \
        rocm_torch:1.3.1_rocm5.2_bullseye \
        python /opt/stable-diffusion-webui/launch.py \
           --skip-install --skip-version-check \
-          --data-dir /dockerx/webui_data \
+          --data-dir /dockerx/webui_data --theme dark \
           --precision full --no-half --medvram --opt-sub-quad-attention
 
 #       --env=PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.6,max_split_size_mb:128 \
