@@ -19,16 +19,5 @@ docker run -it --rm \
        -v $DOCKERX:/dockerx \
        --network=host \
        setsoft/sd_webui:latest \
-       python /opt/stable-diffusion-webui/launch.py \
-          --skip-install --skip-version-check --skip-prepare-environment \
-          --data-dir /dockerx/webui_data --theme dark \
-          --precision full --no-half --medvram --opt-sub-quad-attention
-
-#       --env=PYTORCH_CUDA_ALLOC_CONF=garbage_collection_threshold:0.6,max_split_size_mb:128 \
-# python /opt/stable-diffusion-webui/launch.py --skip-install --skip-version-check --data-dir /dockerx/webui_data --precision full --no-half --medvram --opt-sub-quad-attention
-
-#       --env=XDG_CACHE_HOME=/dockerx/ \
-#       rocm_torch:1.3.1_rocm5.2_bullseye \
-# Para cachear cosas de Debian
-#       debian:bullseye-slim \
+       bash
 

@@ -8,12 +8,8 @@ docker run -it --rm --user 0:0 \
        --group-add=video \
        --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
        --device=/dev/kfd --device=/dev/dri \
-       -v $(pwd)/apt_debs:/var/cache/apt:rw \
-       -v $(pwd)/apt_files:/var/lib/apt:rw \
-       -v $(pwd)/pip:/root/.cache/pip:rw \
-       -v $(pwd)/huggingface:/root/.cache/huggingface:rw \
        -v $(pwd)/persistent.sh:/persistent.sh \
-       -v /mnt/sdb5/dockerx:/dockerx \
+       -v $HOME/dockerx:/dockerx \
        --network=host \
        rocm_torch:1.3.1_rocm5.2_bullseye \
        /persistent.sh
@@ -22,4 +18,8 @@ docker run -it --rm --user 0:0 \
 #       rocm_torch:1.3.1_rocm5.2_bullseye \
 # Para cachear cosas de Debian
 #       debian:bullseye-slim \
+#        -v $(pwd)/apt_debs:/var/cache/apt:rw \
+#        -v $(pwd)/apt_files:/var/lib/apt:rw \
+#        -v $(pwd)/pip:/root/.cache/pip:rw \
+#        -v $(pwd)/huggingface:/root/.cache/huggingface:rw \
 
