@@ -1,8 +1,6 @@
 name: Base OS + ROCm + PyTorch Docker image
 
 on:
-
-on:
   push:
     paths:
       - '.github/workflows/docker-rx5500_pt.yml'
