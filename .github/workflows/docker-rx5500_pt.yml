@@ -1,16 +1,26 @@
 name: Base OS + ROCm + PyTorch Docker image
-
-on:
-  push:
-    paths:
-      - '.github/workflows/docker-rx5500_pt.yml'
-      - 'docker_base/Dockerfile'
-      - 'docker_base/*.sh'
-    tags:
-      - v*
-  repository_dispatch:
-    types: [build_rx5500_pt]
-  workflow_dispatch
+on: workflow_dispatch
+#on:
+#  push:
+#    paths:
+#      - '.github/workflows/docker-rx5500_pt.yml'
+#      - 'docker_base/Dockerfile'
+#      - 'docker_base/*.sh'
+#    tags:
+#      - v*
+#  repository_dispatch:
+#    types: [build_rx5500_pt]
+#  workflow_dispatch:
+#    inputs:
+#      logLevel:
+#        description: 'Log level'
+#        required: true
+#        default: 'warning'
+#        type: choice
+#        options:
+#        - info
+#        - warning
+#        - debug
 
 jobs:
   push_to_registry:
