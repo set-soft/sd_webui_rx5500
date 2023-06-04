@@ -1,0 +1,4 @@
+[safe]
+  directory = *
+[protocol "file"]
+  allow = always
