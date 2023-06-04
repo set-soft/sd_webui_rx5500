@@ -1,5 +1,7 @@
 name: Base OS + ROCm + PyTorch Docker image
 
+on: workflow_dispatch
+
 on:
   push:
     paths:
@@ -10,7 +12,6 @@ on:
       - v*
   repository_dispatch:
     types: [build_rx5500_pt]
-  workflow_dispatch
 
 jobs:
   push_to_registry:
