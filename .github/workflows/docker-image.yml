@@ -1,15 +1,6 @@
 name: Stable Diffusion WebUI Docker image
 
-on:
-  push:
-    paths:
-      - '.github/workflows/docker-image.yml'
-      - 'docker/Dockerfile'
-      - 'docker/*.sh'
-    tags:
-      - v*
-  repository_dispatch:
-    types: [build]
+on: workflow_dispatch
 
 jobs:
   push_to_registry:
