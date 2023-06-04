@@ -1,4 +1,4 @@
-name: Base OS Docker image
+name: Stable Diffusion WebUI Docker image
 
 on:
   push:
