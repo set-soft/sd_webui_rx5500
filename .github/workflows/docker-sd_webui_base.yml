@@ -34,4 +34,4 @@ jobs:
 
     - name: Trigger next layer build
       run: |
-        curl -L -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/set-soft/sd_webui_rx5500/actions/workflows/docker-image.yml/dispatches
+        curl -L -X POST -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/set-soft/sd_webui_rx5500/actions/workflows/docker-image.yml/dispatches
