@@ -27,4 +27,6 @@ COPY gitconfig /etc
 RUN echo "Installing PyTorch dependencies, to avoid getting them from PyTorch" && \
     pip install $PIPOPS requests numpy urllib3 certifi idna charset-normalizer &&\
     echo "Installing PyTorch and ROCm" &&\
-    pip install $PIPOPS torch==$TORCH torchvision==$TORCHV torchaudio==$TORCHA --extra-index-url $TORCHURL
+    pip install $PIPOPS torch==$TORCH torchvision==$TORCHV torchaudio==$TORCHA --extra-index-url $TORCHURL &&\
+    echo "Cache clean-up" &&\
+    rm -r /root/.cache/pip
