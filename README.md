@@ -9,7 +9,7 @@ and similar boards (i.e. RX5600XT, RX5700XT).
 
 The main features of these docker images are:
 - Ready to be used with RX5500XT (all needed options and compatible tools).
-- Small size, when compared to other options (2.5 GB compressed image, 10.5 GB uncompressed, for the soft).
+- Small size, when compared to other options (2 GB compressed image, 10.2 GB uncompressed, for the soft).
 - No need to mess your base OS (no need to install stuff on your base system).
 - Already created, one download and all the software is installed.
 
@@ -17,7 +17,7 @@ Some remarks to avoid confusion:
 - For Linux systems, not for Windows
 - For AMD GPUs, not for NVidia.
 - All software included, not the data files, they will be downloaded by the software.
-  You'll need not less than 5 GiB of extra disk space.
+  You'll need not less than 5 GiB of extra disk space. Control Net needs another 21 GB.
 - Default config is for boards with 8 GB of memory. Can run on 4 GB.
 - This is an image generator using AI networks, not a text generator.
 - Check how old is this README.md file, things change very fast in this field, if the file is old be
@@ -43,16 +43,18 @@ Some remarks to avoid confusion:
 1. Clone this repo, or just download the
    [start_webui.sh](https://github.com/set-soft/sd_webui_rx5500/blob/main/docker/start_webui.sh)
    script.
+   ([start_webui_low.sh](https://github.com/set-soft/sd_webui_rx5500/blob/main/docker/start_webui_low.sh)
+   for a 4 GB board).
 2. Pull the docker image:
 ```
 $ docker pull setsoft/sd_webui:latest
 ```
 3. Create a directory called *dockerx* in your user home dir, i.e. *mkdir -p $HOME/dockerx*.
    You can change the name editing the start script, not recommended.
-4. If you have 4 GB of GPU memory you must edit *start_webui.sh* and change **--medvram** by **--lowvram**.
+4. If you have 4 GB of GPU memory you must use *start_webui_low.sh*, otherwise use *start_webui.sh*.
    If you have more than 8 GB you may want to remove **--medvram** option, but I recommend to first
    try keeping it.
-5. Run the *start_webui.sh* script.
+5. Run the *start_webui.sh* or *start_webui_low.sh* script.
 6. Wait until it says you can connect to 127.0.0.1:7860 port.
    During the first run it will download 4 GB of data for the neural network weights, be patient.
    Just loading the data to the VRAM is slow, on my system it can take upto 80 seconds to load, usually
@@ -70,6 +72,10 @@ web interface data. The *~/dockerx/webui_data/* is the cache for the system runn
 Generated stuff will be stored in *~/dockerx/webui_data/outputs*. The downloaded AI data can be found in
 *~/dockerx/webui_data/models*.
 
+If you want to use Control Net, it makes things better, you'll need to download the models for it in:
+*~/dockerx/webui_data/models/ControlNet*. Please [visit the site](https://github.com/Mikubill/sd-webui-controlnet)
+to learn more. Also visit the [main site](https://github.com/lllyasviel/ControlNet-v1-1-nightly) to know how to
+use it.
 
 ## Technical details
 
@@ -86,7 +92,7 @@ If your kernel doesn't have it, or the vesion included in the kernel isn't good 
 to install a newer version. Lamentably the version of the *amdgpu* driver isn't displayed by the
 module included in mainstream Linux, not at least for my kernel. If you install a separated version it
 will display it. For a 5.10.x kernel with *amdgpu* 5.18.2.22.40 you'll see the following in the kernel
-logs:
+logs: (sudo dmesg | grep version)
 
 ```
 [drm] amdgpu version: 5.18.2.22.40
@@ -112,7 +118,9 @@ amdgpu-install --usecase=dkms
 ```
 
 Do not follow the misleading instructions that says **--usecase=rocm**. This will install several GBs of
-code into your host machine, that will be repeated in the docker image. I experimented very bizarre issues
+code into your host machine, that will be repeated in the docker image.
+
+I experimented very bizarre issues
 trying to compile the module in my system. The long version name used by AMD in combination with the way
 my installed DKMS created the makefiles generated some calls passing a single argument bigger than 128 kB,
 a stupid Linux kernel limit, and made the compilation fail. So instead of compiling it in
@@ -180,7 +188,7 @@ amdgpu 0000:0a:00.0: firmware: direct-loading firmware amdgpu/navi14_vcn.bin
 #### ROCm
 
 [ROCm](https://en.wikipedia.org/wiki/ROCm#ROCk_-_Kernel_driver) is the infrastructure created by AMD to
-use their GPUs for computation. Thi includes the
+use their GPUs for computation. This includes the
 [Machine Learning](https://en.wikipedia.org/wiki/Machine_learning) (ML), which is what we want to do here.
 
 This component is huge for many reasons, among them:
@@ -191,12 +199,12 @@ This component is huge for many reasons, among them:
   work for embedded systems. I agree that some layer of C++ is desirable, but the core functionality
   should be plain C, with an optional C++ abstraction layer. People usually think C++ is close to C, but
   in practice it isn't, when you start using the STL things start to drift away from C. The code
-  generated code is repeated again and again and you can get huge binaries.
+  generated is repeated again and again and you can get huge binaries.
 
 If you are just using ROCm for Stable Diffusion installing the whole thing is an overkill.
 For this reason this docker image isn't based on the ROCm images. Just to put you in perspective:
 ROCm images with PyTorch are in the range of 10 GB compressed, around 30 GB uncompressed.
-This image is under 3 GB, 10 GB uncompressed, and includes the final application.
+This image is around 2 GB, 10 GB uncompressed, and includes the final application.
 
 You don't need to install ROCm in your host, unless you use ROCm for other tasks. Also note that
 installing ROCm in your host won't help to the docker images, they'll have another copy, or even more
@@ -220,7 +228,7 @@ This is the most widely used ML lib and Stable Diffusion uses it. It offers thre
 
 Here we need ROCm flavor. Lamentably I couldn't find a better way than installing it using *pip* (the
 Python package manager). This has really nasty consequences. As I already mentioned ROCm is in this layer.
-The Python way to solve dependencies makes this a "normal" solution. So when you install PtTorch for ROCm
+The Python way to solve dependencies makes this a "normal" solution. So when you install PyTorch for ROCm
 you are installing PyTorch compiled with ROCm support **and** ROCm, all together. This is why the
 compressed size of the PyTorch wheel (the name of the Python packages) is around 1.5 GB.
 
@@ -235,8 +243,8 @@ fresh dependencies they are installed using pip (very inefficient). Among the he
 llvmlite, scipy, OpenCV, gradio, pandas, transformers and numpy. But all of them are eclipsed by the
 PyTorch package, which includes ROCm, this is around 75% of the image size.
 
-The [OpenCV](https://pypi.org/project/opencv-python/) lib needs some special attention. This has a very
-bad separation between GUI vs non-GUI and mainstream vs contrib separation. The proble is aggrieved by
+The [OpenCV](https://pypi.org/project/opencv-python/) lib needs some special attention. It has a very
+bad separation between GUI vs non-GUI and mainstream vs contrib separation. The problem is aggrieved by
 the way *pip* works. So you have four possible packages, and you may end with all of them installed,
 meaning the core OpenCV is four times installed, and the GUI libs twice, not to mention that the contrib
 stuff is also twice times installed. In our particular case we get two copies installed, and none of them
@@ -278,14 +286,14 @@ server was started to see the progress.
 The installation is simple, but can be tricky for AMD boards. Using a docker image allows to solve various
 common problems.
 
-The amount of misleading instructions and bloated installs is notable. AMD seems to be focused in the
+The amount of misleading instructions and bloated installs is notable. AMD seems to be focused on the
 servers applications of ROCm, so they don't spend eough resources to help regular users.
 
 ### Optimizations and options
 
 If you take a look at the original [Stable Diffusion v1](https://github.com/CompVis/stable-diffusion)
-you'll see it says: *runs on a GPU with at least 10GB VRAM*
-And in fast this code doesn't even work on an RX5500XT with 8 GB.
+you'll see it says: *runs on a GPU with at least 10GB VRAM*,
+and in the fast mode this code doesn't even work on an RX5500XT with 8 GB.
 So memory requirements are very important. You can currently run it on 4 GB, and even some report success
 with 2 GB (not for RX5500XT). A number of options has important impact on the memory usage and performance.
 Here are some thing you may need to know.
@@ -361,9 +369,10 @@ in [PyTorch](https://pytorch.org/docs/stable/notes/cuda.html) as a mechanism to 
 allocation strategy. But isn't mentioned in the
 [HIP (ROCm) semantics](https://pytorch.org/docs/stable/notes/hip.html). I think the confusion comes from
 the error printed by PyTorch when you run out of VRAM, it mentions *PYTORCH_HIP_ALLOC_CONF*. Note the
-difference, HIP, not CUDA. By I suspect this is some misleading print.
+difference, HIP, not CUDA. But I suspect this is some misleading print.
 
 I tried the above mentioned variables and didn't notice any change, which is understandable.
+The option is included anyways.
 
 Other people suggests using *--disable-nan-check*. I couldn't see any measurable difference using it for
 RX5500XT, and it sounds like a bad idea, a [NaN](https://en.wikipedia.org/wiki/NaN) is indication of
