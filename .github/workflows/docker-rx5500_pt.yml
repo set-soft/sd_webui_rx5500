@@ -1,4 +1,4 @@
-name: Base OS + ROCm + PyTorch Docker image.
+name: Base OS + ROCm + PyTorch Docker image
 
 on:
   push:
