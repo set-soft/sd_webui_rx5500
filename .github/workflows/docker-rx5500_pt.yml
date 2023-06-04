@@ -31,3 +31,7 @@ jobs:
         cd docker_base
         ./build.sh
         ./push.sh
+
+    - name: Trigger next layer build
+      run: |
+        curl -L -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/set-soft/sd_webui_rx5500/actions/workflows/docker-sd_webui_base.yml/dispatches
