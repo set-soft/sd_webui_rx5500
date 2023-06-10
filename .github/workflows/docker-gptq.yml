@@ -27,7 +27,7 @@ jobs:
         /opt/python/cp38-cp38/bin/pip3.8 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2
         /opt/python/cp38-cp38/bin/python setup_rocm.py bdist_wheel
         rm -R /opt/python/cp38-cp38/lib/python3.8/site-packages/torch
-        /opt/python/cp310-cp310/bin/pip3.8 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2
+        /opt/python/cp310-cp310/bin/pip3.10 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2
         /opt/python/cp310-cp310/bin/python setup_rocm.py bdist_wheel
         rm -R /opt/python/cp310-cp310/lib/python3.10/site-packages/torch
 
@@ -36,12 +36,12 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: wheels
-        path: dist
+        path: GPTQ-for-LLaMa-ROCm/dist
 
     - name: Store build
       if: ${{ always() }}
       uses: actions/upload-artifact@v3
       with:
         name: build
-        path: build
+        path: GPTQ-for-LLaMa-ROCm/build
 
