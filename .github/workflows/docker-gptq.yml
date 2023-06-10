@@ -1,0 +1,38 @@
+name: GPTQ for LLaMa wheel generator
+
+on: workflow_dispatch
+
+jobs:
+  gen_wheels:
+    name: Generate wheels
+    runs-on: ubuntu-latest
+    # This is the docker image used by PyTorch project to generate its
+    # wheels for ROCm 5.2
+    container: pytorch/manylinux-builder:rocm5.2
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+    - name: Build the wheels
+      run: |
+        git clone --depth 1 https://github.com/WapaMario63/GPTQ-for-LLaMa-ROCm.git
+        cd GPTQ-for-LLaMa-ROCm
+        /opt/python/cp39-cp39/bin/pip3.9 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2
+        ls -la /opt/python/cp39-cp39/lib/python3.9/dist-packages/
+        /opt/python/cp39-cp39/bin/python setup_rocm.py bdist_wheel
+
+    - name: Store wheels
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: wheels
+        path: dist
+
+    - name: Store build
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: build
+
