@@ -17,6 +17,7 @@ jobs:
     - name: Build the wheels
       run: |
         # git clone --depth 1 https://github.com/WapaMario63/GPTQ-for-LLaMa-ROCm.git
+        df -h
         # My fork is slightly better
         git clone --depth 1 https://github.com/set-soft/GPTQ-for-LLaMa-ROCm.git
         cd GPTQ-for-LLaMa-ROCm
