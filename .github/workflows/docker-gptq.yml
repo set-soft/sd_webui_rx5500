@@ -16,7 +16,9 @@ jobs:
     steps:
     - name: Build the wheels
       run: |
-        git clone --depth 1 https://github.com/WapaMario63/GPTQ-for-LLaMa-ROCm.git
+        # git clone --depth 1 https://github.com/WapaMario63/GPTQ-for-LLaMa-ROCm.git
+        # My fork is slightly better
+        git clone --depth 1 https://github.com/set-soft/GPTQ-for-LLaMa-ROCm.git
         cd GPTQ-for-LLaMa-ROCm
         /opt/python/cp39-cp39/bin/pip3.9 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2
         /opt/python/cp39-cp39/bin/python setup_rocm.py bdist_wheel
