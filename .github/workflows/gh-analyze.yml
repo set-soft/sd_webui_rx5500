@@ -32,10 +32,10 @@ jobs:
         echo "*********/opt/hostedtoolcache"
         cd /opt/hostedtoolcache
         sudo du -hsc * | sort -rh
-        echo "*********/opt/miscrosoft"
-        cd /opt/miscrosoft
+        echo "*********/opt/microsoft"
+        cd /opt/microsoft
         sudo du -hsc * | sort -rh
         echo "***********************************************"
-        sudo rm -R /opt/hostedtoolcache /opt/miscrosoft
+        sudo rm -R /opt/hostedtoolcache /opt/microsoft /opt/az /opt/google
         df -h
 
