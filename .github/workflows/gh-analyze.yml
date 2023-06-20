@@ -19,11 +19,23 @@ jobs:
         # sudo du -hsc *
         echo "***********************************************"
         cd /usr
-        sudo du -hsc *
+        #sudo du -hsc *
         echo "***********************************************"
         cd /usr/share
-        sudo du -hsc *
+        sudo du -hsc * | sort -rh
         echo "***********************************************"
         cd /opt
-        sudo du -hsc *
+        sudo du -hsc * | sort -rh
+        echo "*********/usr/local"
+        cd /usr/local
+        sudo du -hsc * | sort -rh
+        echo "*********/opt/hostedtoolcache"
+        cd /opt/hostedtoolcache
+        sudo du -hsc * | sort -rh
+        echo "*********/opt/miscrosoft"
+        cd /opt/miscrosoft
+        sudo du -hsc * | sort -rh
+        echo "***********************************************"
+        sudo rm -R /opt/hostedtoolcache /opt/miscrosoft
+        df -h
 
