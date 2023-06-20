@@ -1,0 +1,23 @@
+name: Ubuntu analyzer
+
+on: workflow_dispatch
+
+jobs:
+  gen_wheels:
+    name: Generate wheels
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+    - name: Check what is installed
+      run: |
+        df -h
+        echo "***********************************************"
+        cd /
+        du -hsc *
+        echo "***********************************************"
+        cd /usr/share
+        du -hsc *
+
