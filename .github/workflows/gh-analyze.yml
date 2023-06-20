@@ -44,18 +44,31 @@ jobs:
         echo "git clone --depth 1 https://github.com/set-soft/GPTQ-for-LLaMa-ROCm.git" >> /home/runner/work/wf.sh
         echo "cd GPTQ-for-LLaMa-ROCm" >> /home/runner/work/wf.sh
         echo "/opt/python/cp39-cp39/bin/pip3.9 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp39-cp39/bin/python setup_rocm.py bdist_wheel" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "rm -R /opt/python/cp39-cp39/lib/python3.9/site-packages/torch" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp37-cp37m/bin/pip3.7 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp37-cp37m/bin/python setup_rocm.py bdist_wheel" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "rm -R /opt/python/cp37-cp37m/lib/python3.7/site-packages/torch" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp38-cp38/bin/pip3.8 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp38-cp38/bin/python setup_rocm.py bdist_wheel" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "rm -R /opt/python/cp38-cp38/lib/python3.8/site-packages/torch" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp310-cp310/bin/pip3.10 install torch==1.13.1+rocm5.2 --extra-index-url https://download.pytorch.org/whl/rocm5.2" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "/opt/python/cp310-cp310/bin/python setup_rocm.py bdist_wheel" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         echo "rm -R /opt/python/cp310-cp310/lib/python3.10/site-packages/torch" >> /home/runner/work/wf.sh
+        echo "df -h" >> /home/runner/work/wf.sh
         cat /home/runner/work/wf.sh
+        chmod +x /home/runner/work/wf.sh
         docker pull pytorch/manylinux-builder:rocm5.2
         docker run --rm --workdir /__w/sd_webui_rx5500/sd_webui_rx5500 -e "HOME=/github/home" -e GITHUB_ACTIONS=true -e CI=true -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work":"/__w" -v "/home/runner/runners/2.305.0/externals":"/__e":ro -v "/home/runner/work/_temp":"/__w/_temp" -v "/home/runner/work/_actions":"/__w/_actions" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" pytorch/manylinux-builder:rocm5.2 /bin/sh -c "/__w/wf.sh"
 
