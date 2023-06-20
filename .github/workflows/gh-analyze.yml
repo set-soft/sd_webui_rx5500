@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   gen_wheels:
-    name: Generate wheels
+    name: Look what is installed
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -16,7 +16,7 @@ jobs:
         df -h
         echo "***********************************************"
         cd /
-        sudo du -hsc *
+        # sudo du -hsc *
         echo "***********************************************"
         cd /usr
         sudo du -hsc *
