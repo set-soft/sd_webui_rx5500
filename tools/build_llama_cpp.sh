@@ -12,6 +12,7 @@ git checkout hipblas
 LLAMA_HIPBLAS=1 make -j4 libllama.so
 # Also the binaries
 LLAMA_HIPBLAS=1 make -j4
+mkdir ../../dist/
 zip -9 ../../dist/llama_cpp.zip embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot convert*.py
 # Now create the wheels
 cd ../..
