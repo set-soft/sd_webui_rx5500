@@ -10,28 +10,52 @@ cd llama.cpp
 git checkout hipblas
 # Disable native optimizations
 sed -i -e 's/x86_64 i686/if_disabled/' Makefile
+# Force the use of the dynamic lib, we will create a set of executables and various libs
+sed -i -e 's/build-info.h ggml.o llama.o \(.*\)\$(OBJS)/build-info.h libllama.so \1/' Makefile
 # First pass create a very generic binary
-# Create the dynamic lib we need
-LLAMA_HIPBLAS=1 make -j4 libllama.so
-# Also the binaries
+# Create the dynamic lib and executables
 LLAMA_HIPBLAS=1 make -j4
 mkdir ../../dist/
-mv libllama.so libllama_generic.so
-zip -9 ../../dist/llama_cpp_generic.zip embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot convert*.py libllama_generic.so
+strip --strip-unneeded libllama.so embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot
+mv libllama.so ../../dist/libllama_generic.so
+zip -9 ../../dist/llama_cpp_programs.zip embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot convert*.py
+make clean
+LLAMA_CUDA_DMMV_X=64 LLAMA_CUDA_DMMV_Y=4 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_generic_64x4.so
+make clean
+LLAMA_CUDA_DMMV_X=128 LLAMA_CUDA_DMMV_Y=8 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_generic_128x8.so
 make clean
 # 2nd pass create AVX optimized binary
 sed -i -e 's/OPT = .*/OPT = -O3 -mfma -mf16c -mavx/' Makefile
 LLAMA_HIPBLAS=1 make -j4 libllama.so
-LLAMA_HIPBLAS=1 make -j4
-mv libllama.so libllama_avx.so
-zip -9 ../../dist/llama_cpp_avx.zip embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot convert*.py libllama_avx.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_avx.so
+make clean
+LLAMA_CUDA_DMMV_X=64 LLAMA_CUDA_DMMV_Y=4 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_avx_64x4.so
+make clean
+LLAMA_CUDA_DMMV_X=128 LLAMA_CUDA_DMMV_Y=8 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_avx_128x8.so
 make clean
 # 3rd pass create an SSSE3 optimized binary
 sed -i -e 's/OPT = .*/OPT = -O3 -mssse3/' Makefile
 LLAMA_HIPBLAS=1 make -j4 libllama.so
-LLAMA_HIPBLAS=1 make -j4
-cp libllama.so libllama_ssse3.so
-zip -9 ../../dist/llama_cpp_ssse3.zip embedding main perplexity quantize quantize-stats simple train-text-from-scratch vdot convert*.py libllama_ssse3.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_ssse3.so
+make clean
+LLAMA_CUDA_DMMV_X=64 LLAMA_CUDA_DMMV_Y=4 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+mv libllama.so ../../dist/libllama_ssse3_64x4.so
+make clean
+LLAMA_CUDA_DMMV_X=128 LLAMA_CUDA_DMMV_Y=8 LLAMA_HIPBLAS=1 make -j4 libllama.so
+strip --strip-unneeded libllama.so
+cp libllama.so ../../dist/libllama_ssse3_128x8.so
+# No clean, we will use the SSSE3 with 128x8, the best for my system, quite basic
 # Now create the wheels
 cd ../..
 /opt/python/cp39-cp39/bin/pip3.9 install scikit-build
