@@ -1,9 +1,8 @@
 #!/bin/bash
-sudo groupadd --gid $RENDER_GID render
-sudo usermod -aG render $USERNAME
-sudo usermod -aG video $USERNAME
+sudo sed -i s/105/$RENDER_GID/ /etc/group
 # Cache for huggingface, pip, etc. is /dockerx/cache
 mkdir -p /dockerx/cache
+mv ~/.cache  ~/.cache.no
 ln -s /dockerx/cache ~/.cache
 # All data goes to /dockerx/webui_data/
 DATA=/dockerx/webui_data
@@ -43,8 +42,9 @@ mv $DATA/extensions/sd-webui-additional-networks/models $DATA/extensions/sd-webu
 ln -s $DATA/models $DATA/extensions/sd-webui-additional-networks/models 2>> $DATA/last_start.log
 [ ! -L $DATA/models/lora ] && ln -s $DATA/models/Lora $DATA/models/lora 2>> $DATA/last_start.log
 echo "- All persistent stuff owned by the current user"
-sudo chown -R $USERNAME:$USERNAME $DATA 2>> $DATA/last_start.log
+sudo chown -R 1000:1000 $DATA 2>> $DATA/last_start.log
 # The working directory is SD-webui repo
 cd $SDWEBUI/
 
-exec "$@"
+ARGS="$@"
+sudo su -c "$ARGS" jenkins

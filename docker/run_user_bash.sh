@@ -10,10 +10,7 @@ mkdir -p $DOCKERX/webui_data
 docker run -it --rm \
        --name stable_diffusion_webui \
        -e RENDER_GID \
-       --env=HSA_OVERRIDE_GFX_VERSION=10.3.0 \
        --env=LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4 \
-       --group-add $RENDER_GID \
-       --group-add=video \
        --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
        --device=/dev/kfd --device=/dev/dri \
        -v $DOCKERX:/dockerx \
