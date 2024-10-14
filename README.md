@@ -9,7 +9,8 @@ and similar boards (i.e. RX5600XT, RX5700XT).
 
 The main features of these docker images are:
 - Ready to be used with RX5500XT (all needed options and compatible tools).
-- Small size, when compared to other options (2 GB compressed image, 10.2 GB uncompressed, for the soft).
+- Small size, when compared to other options (PyTorch 2: 3.89 GB compressed, 13.4 GB uncompressed,
+  PyTorch 1: 2 GB compressed image, 10.2 GB uncompressed, for the whole soft).
 - No need to mess your base OS (no need to install stuff on your base system).
 - Already created, one download and all the software is installed.
 
@@ -30,9 +31,9 @@ Some remarks to avoid confusion:
 - At least 4 GB of VRAM (Video RAM)
 - I'm not sure about how much system memory, I used 16 GB RAM and you'll need some swap.
 - A modern Linux kernel with the *amdgpu* driver.
-  I used a 5.10.178 kernel from Debian 11.
+  I used a 6.1.106 kernel from Debian 12 and a 5.10.178 kernel from Debian 11.
   You can install an updated *amdgpu* driver, I tried with 5.18.2.22.40-1504718.20.04, but couldn't find
-  any difference.
+  any difference. In fact I didn't do it for the 6.1 kernel.
   To check if the driver is working run *ls -la /dev/kfd* you should see a device owned by *root* for the
   *render* group
 - Docker engine, otherwise [install](https://docs.docker.com/engine/install/) it.
@@ -52,23 +53,25 @@ $ docker pull setsoft/sd_webui:latest
 3. Create a directory called *dockerx* in your user home dir, i.e. *mkdir -p $HOME/dockerx*.
    You can change the name editing the start script, not recommended.
 4. If you have 4 GB of GPU memory you must use *start_webui_low.sh*, otherwise use *start_webui.sh*.
-   If you have more than 8 GB you may want to remove **--medvram** option, but I recommend to first
+   If you have more than 8 GB you might want to remove **--medvram** option, but I recommend to first
    try keeping it.
 5. Run the *start_webui.sh* or *start_webui_low.sh* script.
 6. Wait until it says you can connect to 127.0.0.1:7860 port.
    During the first run it will download 4 GB of data for the neural network weights, be patient.
-   Just loading the data to the VRAM is slow, on my system it can take upto 80 seconds to load, usually
-   around 46 s.
+   Note that PyTorch 1 images (SD WebUI v1.2 and v1.3 images) takes time to load the data to the VRAM,
+   on my system it can take upto 80 seconds to load, usually around 46 s. The PyTorch 2 images (SD WebUI
+   1.10) are fast, the load takes a few seconds.
 7. Open the indicated URL in your browser, you'll get the UI
 8. Enter something in the positive prompt text box and press the generate button.
-   The first run after starting the server will take longer, around 3 or 4 minutes in my system.
+   The first run after starting the server will take longer. The PyTorch 1 images needs around 3 or 4
+   minutes for my system, the PyTorch 2 images just a few extra seconds.
    Then the time will go down, 14 s aprox. for my system.
    Also note that the first generation will need more memory, so don't start changing the image size, keep
    it low for the first generated image.
 9. Have fun!
 
 All the data will be stored in the *~/dockerx/* folder. Take a look at *~/dockerx/webui_data/* for the
-web interface data. The *~/dockerx/webui_data/* is the cache for the system running inside the container.
+web interface data. The *~/dockerx/cache/* is the cache for the system running inside the container.
 Generated stuff will be stored in *~/dockerx/webui_data/outputs*. The downloaded AI data can be found in
 *~/dockerx/webui_data/models*.
 
@@ -83,12 +86,12 @@ use it.
 
 #### Linux kernel and device driver
 
-At the bottom of the stack is the Linux kernel. I tested this image using 5.10.178.
+At the bottom of the stack is the Linux kernel. I tested this image using 6.1.106 and 5.10.178.
 The kernel must provide the [DRM](https://en.wikipedia.org/wiki/Direct_Rendering_Manage)
 (Direct Render Manager) interface for AMD GPUs. This is the *amdgpu* kernel module.
 
 This module is part of the mainstream Linux kernel, no need to add anything.
-If your kernel doesn't have it, or the vesion included in the kernel isn't good enough you may need
+If your kernel doesn't have it, or the version included in the kernel isn't good enough you might need
 to install a newer version. Lamentably the version of the *amdgpu* driver isn't displayed by the
 module included in mainstream Linux, not at least for my kernel. If you install a separated version it
 will display it. For a 5.10.x kernel with *amdgpu* 5.18.2.22.40 you'll see the following in the kernel
@@ -205,6 +208,7 @@ If you are just using ROCm for Stable Diffusion installing the whole thing is an
 For this reason this docker image isn't based on the ROCm images. Just to put you in perspective:
 ROCm images with PyTorch are in the range of 10 GB compressed, around 30 GB uncompressed.
 This image is around 2 GB, 10 GB uncompressed, and includes the final application.
+The PyTorch 2 image is around 3.9 GB, and 13.4 GB uncompressed.
 
 You don't need to install ROCm in your host, unless you use ROCm for other tasks. Also note that
 installing ROCm in your host won't help to the docker images, they'll have another copy, or even more
@@ -226,15 +230,30 @@ This is the most widely used ML lib and Stable Diffusion uses it. It offers thre
 - CUDA
 - ROCm (HIP Heterogeneous(-compute) Interface for Portability)
 
-Here we need ROCm flavor. Lamentably I couldn't find a better way than installing it using *pip* (the
+Here we need ROCm flavor.
+
+##### PyTorch 1
+
+Lamentably I couldn't find a better way than installing it using *pip* (the
 Python package manager). This has really nasty consequences. As I already mentioned ROCm is in this layer.
 The Python way to solve dependencies makes this a "normal" solution. So when you install PyTorch for ROCm
 you are installing PyTorch compiled with ROCm support **and** ROCm, all together. This is why the
 compressed size of the PyTorch wheel (the name of the Python packages) is around 1.5 GB.
 
-Note that I couldn't get PyTorch 2.0.0, 2.0.1 or 2.1.0 (WIP) versions to work with RX5500XT.
-So this image will install PyTorch 1.13.1 (the last available for the 1.x series). The ROCm version
-used by the installed package is 5.2.
+##### PyTorch 2
+
+Last year I couldn't make PyTorch 2 work. But now I'm using as base a
+[docker image](https://github.com/serhii-nakon/rocm_gfx1012_pytorch) compiled by
+[@serhii-nakon](https://github.com/serhii-nakon).
+This docker image contains a [patched ROCm](https://github.com/xuhuisheng/rocm-build) with gfx1012
+support (Navi14 support), cortesy of [Xu Huisheng](https://github.com/xuhuisheng).
+
+The images contains PyTorch 2.2.0 compiled with ROCm 5.4.3 with the native support.
+They are bigger because more work is needed to polish them. But they solve two major issues:
+
+1. Very slow start-up (46 to 80 seconds in my system). You get the SD WebUI up in just seconds, not minutes
+2. No need to use 32 bits floating point, you can use 16 bits. Lamentably this doesn't mean you
+   get better performance, but you save a lot of VRAM.
 
 #### Other Pyhon libs
 
@@ -287,7 +306,7 @@ The installation is simple, but can be tricky for AMD boards. Using a docker ima
 common problems.
 
 The amount of misleading instructions and bloated installs is notable. AMD seems to be focused on the
-servers applications of ROCm, so they don't spend eough resources to help regular users.
+servers applications of ROCm, so they don't spend enough resources to help regular users.
 
 ### Optimizations and options
 
@@ -302,6 +321,8 @@ The optimizations are documented [here](https://github.com/AUTOMATIC1111/stable-
 I focuse on what is good for RX5500XT, and maybe other similar boards.
 
 #### Floating point format
+
+This was a problem when we didn't have a patched ROCm, so this only applies to the PyTorch 1 images.
 
 The traditional *float* data type in C is a 32 bits floating point number (F32). For ML you can do
 computations with much less resolution. So you'll find a lot of libraries using *half precision* numbers,
@@ -327,7 +348,7 @@ Another option is in the settings of the webui, you can ask to avoid keeping the
 in RAM when the process is done. Face restoration is very important, you don't need to enable it all the
 time, you can generate the images and then go to the *extras* and apply it to the images you selected.
 But having it enabled is nice and it usually takes just a little bit more time, the results are
-remarkable.
+remarkable. Note: 1.10.1 WebUI moved the face restoration away, and you only do it in extras.
 
 When using *--medvram* or *--lowvram* one of the implicit optimizations is to put in VRAM only the
 positive or the negative prompt, one at a time, never both together. This saves VRAM, but also means
@@ -353,6 +374,8 @@ This library is installed in the docker image (libtcmalloc-minimal4) and is forc
 environment variable (`LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libtcmalloc_minimal.so.4`)
 
 #### Unofficial ROCm support
+
+This problem was solved by the patched ROCm, so only applies to the PyTorch 1 images.
 
 The RX5500XT (aka Navi14) boards aren't officially supported by AMD. They are codenamed *gfx1012*, but if
 you tell ROCm the board is a *gfx1030* things work anyways. The 1030, 1012, etc. is the version, so you

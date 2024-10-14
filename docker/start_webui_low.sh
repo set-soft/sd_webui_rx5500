@@ -21,5 +21,5 @@ docker run -it --rm \
        python /opt/stable-diffusion-webui/launch.py \
           --skip-install --skip-version-check --skip-prepare-environment \
           --data-dir /dockerx/webui_data --theme dark \
-          --precision full --no-half --lowvram --opt-sub-quad-attention
+          --lowvram --opt-sub-quad-attention
 
